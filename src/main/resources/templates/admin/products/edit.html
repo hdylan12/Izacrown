@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${pageTitle ?: 'Edit Artwork'}">Edit Artwork</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red-primary: #A22B2B;
+      --red-accent: #D32F2F;
+      --gold-primary: #B8860B;
+      --gold-accent: #DAA520;
+      --black-primary: #1C2526;
+      --black-secondary: #2E3532;
+      --white-primary: #F5F5F5;
+      --white-secondary: #E0E0E0;
+      --text-primary: #F5F5F5;
+      --text-secondary: #D0D0D0;
+      --text-muted: #A0A0A0;
+      --success: #388E3C;
+      --danger: #C62828;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --border-radius-sm: 4px;
+      --border-radius-md: 8px;
+      --border-width: 1px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+      --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+      --transition-fast: 0.2s ease-in-out;
+      --transition-normal: 0.3s ease-in-out;
+    }
+    body {
+      background-color: var(--black-primary);
+      color: var(--text-primary);
+      font-family: 'Noto Serif SC', 'Playfair Display', serif;
+      line-height: 1.6;
+      margin: 0;
+      min-height: 100vh;
+      font-size: var(--font-size-md);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: var(--space-md);
+      color: var(--text-primary);
+    }
+    h1 {
+      font-size: var(--font-size-xl);
+      line-height: 1.2;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: var(--space-md);
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    .admin-header {
+      background-color: var(--black-secondary);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-md);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+    }
+    .admin-header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+    }
+    .admin-header__icon {
+      color: var(--gold-primary);
+      font-size: 1.25rem;
+    }
+    .admin-header__title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .admin-header__back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--border-radius-sm);
+      transition: var(--transition-fast);
+    }
+    .admin-header__back:hover {
+      color: var(--gold-accent);
+      background-color: rgba(184, 134, 11, 0.1);
+    }
+    .admin-content {
+      padding: var(--space-lg) 0;
+    }
+    .admin-card {
+      background-color: var(--black-secondary);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    .admin-card__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+    }
+    .admin-card__icon {
+      color: var(--gold-primary);
+      font-size: 1.25rem;
+    }
+    .admin-card__title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: 0;
+    }
+    .form-group {
+      margin-bottom: var(--space-lg);
+    }
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-sm);
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      font-family: 'Noto Serif SC', serif;
+    }
+    .form-control {
+      display: block;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-md);
+      line-height: 1.5;
+      color: var(--text-primary);
+      background-color: var(--black-primary);
+      border: var(--border-width) solid rgba(184, 134, 11, 0.3);
+      border-radius: var(--border-radius-sm);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      font-family: 'Noto Serif SC', serif;
+    }
+    .form-control:focus {
+      color: var(--text-primary);
+      background-color: var(--black-primary);
+      border-color: var(--gold-accent);
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+    }
+    .form-select {
+      display: block;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-md);
+      line-height: 1.5;
+      color: var(--text-primary);
+      background-color: var(--black-primary);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23b8860b' d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right var(--space-sm) center;
+      background-size: 16px 12px;
+      border: var(--border-width) solid rgba(184, 134, 11, 0.3);
+      border-radius: var(--border-radius-sm);
+      appearance: none;
+      font-family: 'Noto Serif SC', serif;
+    }
+    textarea.form-control {
+      min-height: 120px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      font-weight: 500;
+      text-align: center;
+      text-decoration: none;
+      vertical-align: middle;
+      cursor: pointer;
+      user-select: none;
+      border: var(--border-width) solid transparent;
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--font-size-md);
+      line-height: 1.5;
+      border-radius: var(--border-radius-sm);
+      transition: var(--transition-fast);
+      font-family: 'Playfair Display', serif;
+    }
+    .btn-primary {
+      color: var(--black-primary);
+      background-color: var(--gold-primary);
+      border-color: var(--gold-primary);
+    }
+    .btn-primary:hover {
+      background-color: var(--gold-accent);
+      border-color: var(--gold-accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    .btn-secondary {
+      color: var(--text-primary);
+      background-color: var(--black-secondary);
+      border-color: rgba(184, 134, 11, 0.3);
+    }
+    .btn-secondary:hover {
+      background-color: var(--black-primary);
+      border-color: rgba(184, 134, 11, 0.5);
+    }
+    .btn-group {
+      display: flex;
+      gap: var(--space-md);
+    }
+    .alert {
+      position: relative;
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+      border: var(--border-width) solid transparent;
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .alert-success {
+      color: var(--text-primary);
+      background-color: rgba(56, 142, 60, 0.1);
+      border-color: rgba(56, 142, 60, 0.2);
+    }
+    .alert-danger {
+      color: var(--text-primary);
+      background-color: rgba(198, 40, 40, 0.1);
+      border-color: rgba(198, 40, 40, 0.2);
+    }
+    .alert-icon {
+      font-size: 1.25rem;
+    }
+    .alert-success .alert-icon {
+      color: var(--success);
+    }
+    .alert-danger .alert-icon {
+      color: var(--danger);
+    }
+    .file-upload {
+      margin-bottom: var(--space-md);
+    }
+    .file-upload__input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    .file-upload__label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
+      border: 2px dashed rgba(184, 134, 11, 0.3);
+      border-radius: var(--border-radius-md);
+      background-color: var(--black-primary);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .file-upload__label:hover {
+      border-color: var(--gold-accent);
+    }
+    .file-upload__icon {
+      color: var(--gold-primary);
+      font-size: 1.5rem;
+      margin-bottom: var(--space-sm);
+    }
+    .file-upload__text {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .file-upload__hint {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+    .file-upload__preview, .current-image {
+      max-width: 200px;
+      max-height: 200px;
+      margin-top: var(--space-md);
+      border-radius: var(--border-radius-sm);
+      border: 2px solid var(--gold-primary);
+      display: none;
+    }
+    .text-danger {
+      color: var(--danger);
+      font-size: var(--font-size-sm);
+      margin-top: var(--space-xs);
+    }
+    .d-flex {
+      display: flex;
+    }
+    .gap-3 {
+      gap: var(--space-md);
+    }
+    .align-items-center {
+      align-items: center;
+    }
+    .justify-content-between {
+      justify-content: space-between;
+    }
+    @media (min-width: 768px) {
+      .container {
+        padding: 0 var(--space-lg);
+      }
+      .admin-content {
+        padding: var(--space-xl) 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="admin-header">
+  <div class="d-flex align-items-center">
+    <a href="#" class="admin-header__brand">
+      <i class="fas fa-paint-brush admin-header__icon"></i>
+      <span class="admin-header__title">Asian Art Gallery Admin</span>
+    </a>
+  </div>
+  <a th:href="@{/admin/artworks}" class="admin-header__back">
+    <i class="fas fa-arrow-left"></i>
+    <span>Back to Artworks</span>
+  </a>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+    <div class="admin-card">
+      <div class="admin-card__header">
+        <i class="fas fa-edit admin-card__icon"></i>
+        <h1 class="admin-card__title">Edit Artwork</h1>
+      </div>
+
+      <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fas fa-check-circle alert-icon"></i>
+        <span th:text="${successMessage}"></span>
+      </div>
+
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fas fa-exclamation-circle alert-icon"></i>
+        <span th:text="${errorMessage}"></span>
+      </div>
+
+      <form th:action="@{/admin/products/edit/{id}(id=${product.id})}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="title" class="form-label">Artwork Title</label>
+          <input type="text" class="form-control" id="title" th:field="*{name}" required>
+          <div th:errors="*{name}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="artist" class="form-label">Artist</label>
+          <input type="text" class="form-control" id="artist" th:field="*{artist}" required>
+          <div th:errors="*{artist}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" th:field="*{description}" rows="5" required></textarea>
+          <div th:errors="*{description}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="medium" class="form-label">Medium</label>
+          <input type="text" class="form-control" id="medium" th:field="*{medium}" placeholder="e.g., Ink on Silk, Oil on Canvas">
+          <div th:errors="*{medium}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="dimensions" class="form-label">Dimensions (cm)</label>
+          <input type="text" class="form-control" id="dimensions" th:field="*{dimensions}" placeholder="e.g., 50 x 70">
+          <div th:errors="*{dimensions}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="year" class="form-label">Year Created</label>
+          <input type="number" class="form-control" id="year" th:field="*{year}" min="0" max="2025">
+          <div th:errors="*{year}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="price" class="form-label">Price ($)</label>
+          <input type="number" class="form-control" id="price" th:field="*{price}" step="0.01" min="0.01" required>
+          <div th:errors="*{price}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="stock" class="form-label">Stock Quantity</label>
+          <input type="number" class="form-control" id="stock" th:field="*{stock}" min="0" required>
+          <div th:errors="*{stock}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="style" class="form-label">Art Style</label>
+          <select class="form-select" id="style" th:field="*{category}">
+            <option value="">Select a style</option>
+            <option value="Chinese Ink">Chinese Ink</option>
+            <option value="Japanese Ukiyo-e">Japanese Ukiyo-e</option>
+            <option value="Korean Minhwa">Korean Minhwa</option>
+            <option value="Indian Mughal">Indian Mughal</option>
+            <option value="Southeast Asian Batik">Southeast Asian Batik</option>
+          </select>
+          <div th:errors="*{category}" class="text-danger"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="image" class="form-label">Artwork Image</label>
+          <div class="file-upload">
+            <input type="file" id="image" name="image" accept="image/*" class="file-upload__input">
+            <label for="image" class="file-upload__label">
+              <i class="fas fa-cloud-upload-alt file-upload__icon"></i>
+              <span class="file-upload__text">Click or drag to upload new image</span>
+              <span class="file-upload__hint">JPG, PNG, GIF up to 5MB (leave blank to keep current image)</span>
+            </label>
+            <img id="imagePreview" class="file-upload__preview" src="#" alt="Image Preview"/>
+            <div th:if="${imageError}" class="text-danger" th:text="${imageError}"></div>
+            <div th:if="${product.id}" class="mt-3">
+              <p class="form-label">Current Image:</p>
+              <img th:src="@{/api/product-images/{id}(id=${product.id})}" class="current-image" th:alt="${product.name ?: 'Artwork'}" onerror="this.src='/images/placeholder.jpg'; console.log('Failed to load image for artwork ID: ' + ${product.id});"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            <span>Save Changes</span>
+          </button>
+          <a th:href="@{/admin/artworks}" class="btn btn-secondary">
+            <i class="fas fa-times"></i>
+            <span>Cancel</span>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('image');
+    const uploadLabel = document.querySelector('.file-upload__label');
+    const preview = document.getElementById('imagePreview');
+    const currentImage = document.querySelector('.current-image');
+
+    if (currentImage) {
+      currentImage.style.display = 'block';
+      currentImage.addEventListener('load', () => {
+        console.log('Current artwork image loaded successfully for ID: ' + currentImage.getAttribute('data-id'));
+      });
+      currentImage.setAttribute('data-id', currentImage.src.split('/').pop());
+    }
+
+    uploadLabel.addEventListener('click', (e) => {
+      if (e.target !== fileInput) {
+        fileInput.click();
+      }
+    });
+
+    uploadLabel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadLabel.style.borderColor = 'var(--gold-accent)';
+      uploadLabel.style.backgroundColor = 'rgba(184, 134, 11, 0.05)';
+    });
+
+    uploadLabel.addEventListener('dragleave', () => {
+      uploadLabel.style.borderColor = 'rgba(184, 134, 11, 0.3)';
+      uploadLabel.style.backgroundColor = 'var(--black-primary)';
+    });
+
+    uploadLabel.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadLabel.style.borderColor = 'rgba(184, 134, 11, 0.3)';
+      uploadLabel.style.backgroundColor = 'var(--black-primary)';
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file (JPG, PNG, GIF).');
+          fileInput.value = '';
+          preview.style.display = 'none';
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File size exceeds 5MB limit.');
+          fileInput.value = '';
+          preview.style.display = 'none';
+          return;
+        }
+        handleFileSelect(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+
+    function handleFileSelect(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        preview.style.opacity = '0';
+        setTimeout(() => {
+          preview.style.transition = 'opacity 0.3s ease';
+          preview.style.opacity = '1';
+        }, 50);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+</body>
+</html>

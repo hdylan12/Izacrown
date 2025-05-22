@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold-primary: #B8860B;
+            --gold-accent: #DAA520;
+            --black-primary: #1C2526;
+            --black-secondary: #2E3532;
+            --white-primary: #F5F5F5;
+            --text-primary: #F5F5F5;
+            --text-secondary: #D0D0D0;
+            --success: #388E3C;
+            --danger: #C62828;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-width: 1px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --transition-fast: 0.2s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+        }
+        body {
+            background-color: var(--black-primary);
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', 'Playfair Display', serif;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            font-size: var(--font-size-md);
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+        }
+        h1 .title-icon {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+            font-size: 1.8rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: var(--space-lg) auto;
+            padding: var(--space-lg);
+            background-color: var(--black-secondary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            box-shadow: var(--shadow-sm);
+        }
+        .header {
+            background-color: var(--black-secondary);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+        }
+        .header-brand .brand-logo {
+            color: var(--gold-primary);
+            font-size: 1.6rem;
+            margin-right: var(--space-sm);
+        }
+        .header-brand .brand-name {
+            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            transition: var(--transition-fast);
+            text-decoration: none;
+        }
+        .header-brand:hover .brand-name {
+            color: var(--gold-accent);
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        .profile-dropdown {
+            position: relative;
+        }
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+        .profile-picture {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--gold-primary);
+            transition: var(--transition-fast);
+            position: relative;
+        }
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-trigger:hover .profile-picture {
+            border-color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            padding: var(--space-md);
+            display: none;
+            z-index: 1000;
+        }
+        .profile-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-header {
+            padding-bottom: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            font-weight: 600;
+            color: var(--gold-primary);
+        }
+        .dropdown-item {
+            padding: var(--space-sm) 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            transition: var(--transition-fast);
+        }
+        .dropdown-item:hover {
+            color: var(--text-primary);
+            background-color: rgba(184, 134, 11, 0.1);
+        }
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: var(--space-sm);
+        }
+        .dropdown-stat {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-sm);
+            margin: var(--space-sm) 0;
+            border: 1px solid rgba(184, 134, 11, 0.1);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .dropdown-stat-icon {
+            color: var(--gold-primary);
+            font-size: 1.2rem;
+        }
+        .dropdown-stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .dropdown-stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .dropdown-stat-value:hover {
+            color: var(--gold-accent);
+        }
+        .dropdown-stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        .cart-icon {
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+        .cart-icon:hover {
+            color: var(--gold-accent);
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: var(--gold-primary);
+            color: var(--black-primary);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+        .profile-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+        }
+        .profile-picture-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .profile-info-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        .profile-picture-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        .profile-picture-large {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-primary);
+            transition: var(--transition-normal);
+        }
+        .profile-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: var(--space-sm);
+            text-align: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition-normal);
+        }
+        .profile-picture-container:hover .profile-upload-overlay {
+            opacity: 1;
+        }
+        .profile-picture-container:hover .profile-picture-large {
+            transform: scale(1.05);
+        }
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-sm);
+            color: var(--text-secondary);
+        }
+        .form-control {
+            width: 100%;
+            padding: var(--space-sm);
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            color: var(--text-primary);
+            border-radius: var(--border-radius-sm);
+        }
+        .btn {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        .btn-primary {
+            background-color: var(--gold-primary);
+            color: var(--black-primary);
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: var(--gold-accent);
+        }
+        .alert {
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .alert-success {
+            background-color: rgba(56, 142, 60, 0.1);
+            border: 1px solid rgba(56, 142, 60, 0.2);
+            color: var(--text-primary);
+        }
+        .alert-danger {
+            background-color: rgba(198, 40, 40, 0.1);
+            border: 1px solid rgba(198, 40, 40, 0.2);
+            color: var(--text-primary);
+        }
+        .alert-icon {
+            margin-right: var(--space-sm);
+            font-size: 1.25rem;
+        }
+        .text-danger {
+            color: var(--danger);
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-xs);
+        }
+        .custom-file-upload {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-brand">
+        <i class="fas fa-paint-brush brand-logo"></i>
+        <a href="/shop" class="brand-name">Asian Art Gallery</a>
+    </div>
+    <div class="header-right">
+        <a href="/cart" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" th:text="${cartCount != null ? cartCount : '0'}">0</span>
+        </a>
+        <div class="profile-dropdown">
+            <div class="profile-trigger">
+                <div class="profile-picture">
+                    <img th:src="${profilePicture ?: '/images/default-avatar.jpg'}" th:alt="${user != null ? user.firstName + ' ' + user.lastName : 'Guest'}" alt="Profile Picture">
+                </div>
+            </div>
+            <div class="dropdown-menu">
+                <div class="dropdown-header">
+                    <span th:text="${user != null ? user.firstName + ' ' + user.lastName : 'Guest'}">Guest User</span>
+                </div>
+                <div class="dropdown-stat">
+                    <div class="dropdown-stat-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="dropdown-stat-content">
+                        <a href="/orders" class="dropdown-stat-value" th:text="${orderCount != null ? orderCount : 0}">0</a>
+                        <span class="dropdown-stat-label">Orders</span>
+                    </div>
+                </div>
+                <div class="dropdown-stat">
+                    <div class="dropdown-stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="dropdown-stat-content">
+                        <a href="/wishlist" class="dropdown-stat-value" th:text="${wishlistCount != null ? wishlistCount : 0}">0</a>
+                        <span class="dropdown-stat-label">Wishlist</span>
+                    </div>
+                </div>
+                <div class="dropdown-stat">
+                    <div class="dropdown-stat-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="dropdown-stat-content">
+                        <a href="/total-spent" class="dropdown-stat-value" th:text="${totalSpent != null ? '$' + totalSpent : '$0'}">$0</a>
+                        <span class="dropdown-stat-label">Total Spent</span>
+                    </div>
+                </div>
+                <a href="/account" class="dropdown-item">
+                    <i class="fas fa-user"></i> My Account
+                </a>
+                <a href="/settings" class="dropdown-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                <a th:href="@{/logout}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="profile-section">
+        <div class="profile-header">
+            <h1><i class="fas fa-user-circle title-icon"></i> My Account</h1>
+        </div>
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle alert-icon"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div class="profile-content">
+            <div class="profile-picture-section">
+                <div class="profile-picture-container">
+                    <img th:src="${profilePicture}" class="profile-picture-large"
+                         th:alt="${user.firstName + ' ' + user.lastName}" alt="Profile Picture">
+                    <div class="profile-upload-overlay" id="uploadTrigger">
+                        <i class="fas fa-camera"></i> Change Photo
+                    </div>
+                </div>
+                <form th:action="@{/account/upload-profile-image}" method="post" enctype="multipart/form-data" class="profile-form" id="uploadForm">
+                    <div class="form-group">
+                        <div class="custom-file-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div class="upload-text">Drag & drop your photo here or click to browse</div>
+                            <div class="upload-hint">JPG, PNG up to 5MB</div>
+                        </div>
+                        <input type="file" class="form-control" id="file" name="file" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-save"></i> Update Picture
+                    </button>
+                </form>
+            </div>
+            <div class="profile-info-section">
+                <form th:action="@{/account/update-info}" th:object="${user}" method="post" id="infoForm">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                        <div th:if="${#fields.hasErrors('firstName')}" class="text-danger" th:errors="*{firstName}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                        <div th:if="${#fields.hasErrors('lastName')}" class="text-danger" th:errors="*{lastName}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                        <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" th:field="*{phone}">
+                        <div th:if="${#fields.hasErrors('phone')}" class="text-danger" th:errors="*{phone}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" th:field="*{address}"></textarea>
+                        <div th:if="${#fields.hasErrors('address')}" class="text-danger" th:errors="*{address}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" th:field="*{city}">
+                        <div th:if="${#fields.hasErrors('city')}" class="text-danger" th:errors="*{city}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="zipCode" class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" id="zipCode" th:field="*{zipCode}">
+                        <div th:if="${#fields.hasErrors('zipCode')}" class="text-danger" th:errors="*{zipCode}"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <p>© 2025 Asian Art Gallery. All rights reserved.</p>
+    </div>
+</footer>
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadTrigger = document.getElementById('uploadTrigger');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const formFileInput = uploadForm.querySelector('input[type="file"]');
+        uploadTrigger.addEventListener('click', function() {
+            fileInput.click();
+        });
+        [fileInput, formFileInput].forEach(input => {
+            input.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    if (!file.type.match('image.*')) {
+                        alert('Please select an image file (JPEG, PNG)');
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size exceeds 5MB limit');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector('.profile-picture-large').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    formFileInput.files = dataTransfer.files;
+                }
+            });
+        });
+        const infoForm = document.getElementById('infoForm');
+        infoForm.addEventListener('submit', function(e) {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!firstName || !lastName || !email) {
+                e.preventDefault();
+                alert('Please fill in all required fields');
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                e.preventDefault();
+                alert('Please enter a valid email address');
+                return;
+            }
+        });
+    });
+</script>
+</body>
+</html>

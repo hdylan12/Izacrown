@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Asian Art Gallery</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red-primary: #A22B2B;
+            --red-accent: #D32F2F;
+            --gold-primary: #B8860B;
+            --gold-accent: #DAA520;
+            --black-primary: #1C2526;
+            --black-secondary: #2E3532;
+            --white-primary: #F5F5F5;
+            --white-secondary: #E0E0E0;
+            --text-primary: #F5F5F5;
+            --text-secondary: #D0D0D0;
+            --text-muted: #A0A0A0;
+            --success: #388E3C;
+            --danger: #C62828;
+            --info: #17A2B8;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-width: 1px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --transition-fast: 0.2s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+        }
+        body {
+            background-color: var(--black-primary);
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', 'Playfair Display', serif;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            font-size: var(--font-size-md);
+        }
+        h1, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+        h1 {
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+        }
+        h1 .title-icon {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+            font-size: 1.8rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: var(--space-lg) auto;
+            padding: var(--space-lg);
+            background-color: var(--black-secondary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            box-shadow: var(--shadow-sm);
+        }
+        .header {
+            background: linear-gradient(180deg, var(--black-secondary), var(--black-primary));
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+        }
+        .header-brand .brand-logo {
+            color: var(--gold-primary);
+            font-size: 1.6rem;
+            margin-right: var(--space-sm);
+        }
+        .header-brand .brand-name {
+            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            transition: var(--transition-fast);
+            text-decoration: none;
+        }
+        .header-brand:hover .brand-name {
+            color: var(--gold-accent);
+        }
+        .header-nav {
+            display: flex;
+            gap: var(--space-md);
+        }
+        .header-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            transition: var(--transition-fast);
+        }
+        .header-nav a:hover {
+            color: var(--gold-accent);
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        .profile-dropdown {
+            position: relative;
+        }
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+        .profile-picture {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--gold-primary);
+            transition: var(--transition-fast);
+            position: relative;
+        }
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-trigger:hover .profile-picture {
+            border-color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            padding: var(--space-md);
+            display: none;
+            z-index: 1000;
+        }
+        .profile-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-header {
+            padding-bottom: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            font-weight: 600;
+            color: var(--gold-primary);
+        }
+        .dropdown-item {
+            padding: var(--space-sm) 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            transition: var(--transition-fast);
+        }
+        .dropdown-item:hover {
+            color: var(--text-primary);
+            background-color: rgba(184, 134, 11, 0.1);
+        }
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: var(--space-sm);
+        }
+        .cart-icon {
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+        .cart-icon:hover {
+            color: var(--gold-accent);
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: var(--gold-primary);
+            color: var(--black-primary);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+            font-size: var(--font-size-sm);
+        }
+        .form-control {
+            background-color: var(--black-secondary);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            color: var(--text-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-sm) var(--space-md);
+        }
+        .form-control:focus {
+            border-color: var(--gold-accent);
+            box-shadow: 0 0 5px rgba(218, 165, 32, 0.3);
+        }
+        .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+        .invalid-feedback {
+            color: var(--danger);
+            font-size: var(--font-size-sm);
+            margin-top: var(--space-xs);
+        }
+        .btn {
+            font-weight: 500;
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-sm) var(--space-md);
+            transition: var(--transition-fast);
+            font-size: var(--font-size-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background-color: var(--gold-primary);
+            border-color: var(--gold-primary);
+            color: var(--black-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--gold-accent);
+            border-color: var(--gold-accent);
+        }
+        .alert {
+            padding: var(--space-md);
+            margin-bottom: var(--space-md);
+            border: var(--border-width) solid transparent;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .alert-success {
+            background-color: rgba(56, 142, 60, 0.1);
+            border-color: rgba(56, 142, 60, 0.2);
+            color: var(--text-primary);
+        }
+        .alert-danger {
+            background-color: rgba(198, 40, 40, 0.1);
+            border-color: rgba(198, 40, 40, 0.2);
+            color: var(--text-primary);
+        }
+        .alert-icon {
+            font-size: 1.25rem;
+            color: var(--success);
+        }
+        .alert-danger .alert-icon {
+            color: var(--danger);
+        }
+        .contact-info {
+            font-size: var(--font-size-md);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+        .contact-info p {
+            margin-bottom: var(--space-sm);
+        }
+        .footer {
+            background-color: var(--black-secondary);
+            padding: var(--space-lg);
+            border-top: 1px solid rgba(184, 134, 11, 0.2);
+            text-align: center;
+        }
+        .footer p {
+            margin: 0;
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        .social-links {
+            margin-top: var(--space-md);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+        }
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+        .social-links a:hover {
+            color: var(--gold-accent);
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+            .header-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-brand">
+        <i class="fas fa-paint-brush brand-logo"></i>
+        <a href="/" class="brand-name">Asian Art Gallery</a>
+    </div>
+    <nav class="header-nav">
+        <a href="/shop">Shop</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+    </nav>
+    <div class="header-right">
+        </div>
+    </div>
+</header>
+<main>
+    <div class="container">
+        <h1>
+            <i class="fas fa-envelope title-icon"></i>
+            Contact Us
+        </h1>
+        <div class="contact-info">
+            <p><i class="fas fa-map-marker-alt"></i> 123 Art Street, Cultural District, City, Country</p>
+            <p><i class="fas fa-phone"></i> +1 (234) 567-8900</p>
+            <p><i class="fas fa-envelope"></i> contact@asianartgallery.com</p>
+        </div>
+        <form id="contactForm" class="mt-4">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter your name.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter a valid email address.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                <div class="invalid-feedback">
+                    Please enter your message.
+                </div>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
+            </div>
+        </form>
+        <div id="contactMessage" class="alert d-none"></div>
+    </div>
+</main>
+<footer class="footer">
+    <div class="container">
+        <p>© 2025 Asian Art Gallery. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://facebook.com"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+</footer>
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.querySelector('#contactForm');
+        const contactMessage = document.querySelector('#contactMessage');
+        const cartCount = document.querySelector('.cart-count');
+
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/cart/count');
+                if (response.ok) {
+                    const count = await response.text();
+                    cartCount.textContent = count;
+                }
+            } catch (error) {
+                console.error('Error fetching cart count:', error);
+            }
+        }
+        updateCartCount();
+
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.querySelector('#name');
+            const email = document.querySelector('#email');
+            const message = document.querySelector('#message');
+
+            // Reset validation states
+            name.classList.remove('is-invalid');
+            email.classList.remove('is-invalid');
+            message.classList.remove('is-invalid');
+
+            let isValid = true;
+            if (!name.value.trim()) {
+                name.classList.add('is-invalid');
+                isValid = false;
+            }
+            if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                email.classList.add('is-invalid');
+                isValid = false;
+            }
+            if (!message.value.trim()) {
+                message.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `name=${encodeURIComponent(name.value.trim())}&email=${encodeURIComponent(email.value.trim())}&message=${encodeURIComponent(message.value.trim())}`
+                });
+                const result = await response.text();
+                if (result.startsWith('success')) {
+                    contactMessage.className = 'alert alert-success';
+                    contactMessage.innerHTML = '<i class="fas fa-check-circle alert-icon"></i> ' + result.substring(8);
+                    contactMessage.classList.remove('d-none');
+                    contactForm.reset();
+                    setTimeout(() => {
+                        contactMessage.classList.add('d-none');
+                    }, 5000);
+                } else {
+                    contactMessage.className = 'alert alert-danger';
+                    contactMessage.innerHTML = '<i class="fas fa-exclamation-circle alert-icon"></i> ' + result.substring(6);
+                    contactMessage.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error submitting contact form:', error);
+                contactMessage.className = 'alert alert-danger';
+                contactMessage.innerHTML = '<i class="fas fa-exclamation-circle alert-icon"></i> Failed to send message';
+                contactMessage.classList.remove('d-none');
+            }
+        });
+    });
+</script>
+</body>
+</html>

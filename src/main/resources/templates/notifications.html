@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Notifications - Asian Art Gallery</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red-primary: #A22B2B;
+            --red-accent: #D32F2F;
+            --gold-primary: #B8860B;
+            --gold-accent: #DAA520;
+            --black-primary: #1C2526;
+            --black-secondary: #2E3532;
+            --white-primary: #F5F5F5;
+            --white-secondary: #E0E0E0;
+            --text-primary: #F5F5F5;
+            --text-secondary: #D0D0D0;
+            --text-muted: #A0A0A0;
+            --success: #388E3C;
+            --danger: #C62828;
+            --info: #17A2B8;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-width: 1px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --transition-fast: 0.2s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+        }
+        body {
+            background-color: var(--black-primary);
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', serif;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            font-size: var(--font-size-md);
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+        }
+        h1 .title-icon {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+            font-size: 1.8rem;
+            transition: var(--transition-fast);
+        }
+        h1 .title-icon:hover {
+            color: var(--gold-accent);
+        }
+        .header {
+            background: linear-gradient(180deg, var(--black-secondary), var(--black-primary));
+            border-bottom: var(--border-width) solid rgba(184, 134, 11, 0.2);
+            padding: var(--space-md) var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-brand .brand-logo {
+            color: var(--gold-primary);
+            font-size: 1.6rem;
+            margin-right: var(--space-sm);
+            transition: var(--transition-fast);
+        }
+        .header-brand .brand-name {
+            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        .header-brand:hover .brand-name,
+        .header-brand:hover .brand-logo {
+            color: var(--gold-accent);
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            flex-shrink: 0;
+        }
+        .nav-links {
+            display: flex;
+            gap: var(--space-md);
+            margin-right: var(--space-lg);
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .nav-links a:hover {
+            color: var(--gold-accent);
+        }
+        .cart-icon, .notification-icon {
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+        .cart-icon:hover, .notification-icon:hover {
+            color: var(--gold-accent);
+        }
+        .cart-count, .notification-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: var(--gold-primary);
+            color: var(--black-primary);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .profile-dropdown {
+            position: relative;
+        }
+        .profile-trigger {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            cursor: pointer;
+        }
+        .profile-picture {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--gold-primary);
+            transition: var(--transition-fast);
+        }
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-trigger:hover .profile-picture {
+            border-color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            padding: var(--space-md);
+            display: none;
+            z-index: 1000;
+        }
+        .profile-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-header {
+            padding-bottom: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            font-weight: 600;
+            color: var(--gold-primary);
+        }
+        .dropdown-item {
+            padding: var(--space-sm) 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            transition: var(--transition-fast);
+        }
+        .dropdown-item:hover {
+            color: var(--text-primary);
+            background-color: rgba(184, 134, 11, 0.1);
+        }
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: var(--space-sm);
+        }
+        .container {
+            max-width: 800px;
+            margin: var(--space-xl) auto;
+            padding: var(--space-lg);
+            background-color: var(--black-secondary);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        .notifications-content {
+            padding: var(--space-lg);
+            border: var(--border-width) solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-md);
+            background-color: var(--black-primary);
+        }
+        .alert {
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: var(--font-size-md);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .alert-info {
+            background-color: rgba(23, 162, 184, 0.1);
+            border-color: rgba(23, 162, 184, 0.2);
+            color: var(--text-primary);
+        }
+        .alert-info i {
+            color: var(--info);
+            font-size: 1.5rem;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .btn {
+            font-weight: 500;
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-sm) var(--space-lg);
+            transition: var(--transition-fast);
+            font-size: var(--font-size-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: var(--space-sm);
+        }
+        .btn-primary {
+            background-color: var(--gold-primary);
+            border-color: var(--gold-primary);
+            color: var(--black-primary);
+        }
+        .btn-primary:hover {
+            background-color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-primary);
+        }
+        .btn-secondary:hover {
+            background-color: rgba(184, 134, 11, 0.1);
+            color: var(--gold-accent);
+            border-color: var(--gold-accent);
+            transform: scale(1.05);
+        }
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .notification-item {
+            background-color: var(--black-secondary);
+            border: var(--border-width) solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-fast);
+        }
+        .notification-item.unread {
+            background-color: rgba(184, 134, 11, 0.1);
+        }
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .notification-icon {
+            font-size: 1.25rem;
+        }
+        .notification-icon.SUCCESS { color: var(--success); }
+        .notification-icon.INFO { color: var(--info); }
+        .notification-icon.ERROR { color: var(--danger); }
+        .notification-text {
+            text-align: left;
+        }
+        .notification-text .title {
+            font-weight: 600;
+            color: var(--gold-primary);
+            font-size: var(--font-size-sm);
+        }
+        .notification-text .message {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        .notification-text .timestamp {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        .notification-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        .toast-container {
+            position: fixed;
+            top: var(--space-md);
+            right: var(--space-md);
+            z-index: 1100;
+        }
+        .toast {
+            background-color: var(--black-secondary);
+            border: var(--border-width) solid rgba(184, 134, 11, 0.2);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+            max-width: 350px;
+            margin-bottom: var(--space-sm);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-sm);
+        }
+        .toast .toast-header {
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            color: var(--gold-primary);
+            margin-bottom: var(--space-xs);
+        }
+        .toast .toast-body {
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+        }
+        .toast .toast-icon {
+            font-size: 1.25rem;
+            margin-right: var(--space-sm);
+        }
+        .toast.SUCCESS .toast-icon { color: var(--success); }
+        .toast.INFO .toast-icon { color: var(--info); }
+        .toast.ERROR .toast-icon { color: var(--danger); }
+        .toast .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        .toast .close-btn:hover {
+            color: var(--gold-accent);
+        }
+        .footer {
+            background-color: var(--black-secondary);
+            padding: var(--space-lg);
+            border-top: 1px solid rgba(184, 134, 11, 0.2);
+            text-align: center;
+        }
+        .footer p {
+            margin: 0;
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+        }
+        .social-links {
+            margin-top: var(--space-md);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+        }
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+        .social-links a:hover {
+            color: var(--gold-accent);
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+                margin: var(--space-lg) var(--space-sm);
+            }
+            .nav-links {
+                display: none;
+            }
+            .header {
+                padding: var(--space-sm) var(--space-md);
+            }
+            .notification-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+            .notification-actions {
+                align-self: flex-end;
+            }
+            .toast-container {
+                top: var(--space-sm);
+                right: var(--space-sm);
+                left: var(--space-sm);
+                width: auto;
+            }
+        }
+        @media (max-width: 480px) {
+            .notifications-content {
+                padding: var(--space-md);
+            }
+            .btn {
+                width: 100%;
+                margin: var(--space-xs) 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-brand">
+        <i class="fas fa-paint-brush brand-logo"></i>
+        <a href="/shop" class="brand-name">Asian Art Gallery</a>
+    </div>
+    <div class="header-right">
+        <div class="nav-links">
+            <a href="/shop">Shop</a>
+            <a href="/cart">Cart</a>
+            <a href="/account">Account</a>
+            <a href="/account/orders">Orders</a>
+        </div>
+        <a th:href="@{/cart}" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" th:text="${cartCount != null ? cartCount : '0'}">0</span>
+        </a>
+        <a href="/notifications" class="notification-icon">
+            <i class="fas fa-bell"></i>
+            <span class="notification-count" th:text="${unreadCount != null ? unreadCount : '0'}">0</span>
+        </a>
+        <div class="profile-dropdown">
+            <div class="profile-trigger">
+                <div class="profile-picture">
+                    <img th:src="${profileImage}" th:alt="${user != null ? user.firstName + ' ' + user.lastName : 'Guest'}" alt="Profile Picture">
+                </div>
+            </div>
+            <div class="dropdown-menu">
+                <div class="dropdown-header">
+                    <span th:text="${user != null ? user.firstName + ' ' + user.lastName : 'Guest'}">Guest User</span>
+                </div>
+                <a href="/account" class="dropdown-item">
+                    <i class="fas fa-user"></i> My Account
+                </a>
+                <a href="/account/orders" class="dropdown-item">
+                    <i class="fas fa-list-alt"></i> My Orders
+                </a>
+                <a th:href="@{/logout}" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <div class="container">
+        <div class="toast-container" id="toastContainer"></div>
+        <div class="notifications-content">
+            <h1>
+                <i class="fas fa-bell title-icon"></i>
+                <span th:text="${pageTitle}">Notifications</span>
+            </h1>
+            <div th:if="${notifications.isEmpty}" class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No notifications found.
+            </div>
+            <div th:unless="${notifications.isEmpty}" class="mb-3">
+                <form th:action="@{/notifications/mark-all-read}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check-circle"></i> Mark All as Read
+                    </button>
+                </form>
+            </div>
+            <ul class="notification-list" th:unless="${notifications.isEmpty}">
+                <li th:each="notification : ${notifications}"
+                    th:classappend="${notification.read} ? 'notification-item' : 'notification-item unread'">
+                    <div class="notification-content">
+                        <i th:class="'fas fa-bell notification-icon ' + ${notification.type}"></i>
+                        <div class="notification-text">
+                            <div class="title" th:text="${notification.title}">Notification Title</div>
+                            <div class="message" th:text="${notification.message}">Notification message goes here.</div>
+                            <div class="timestamp" th:text="${#temporals.format(notification.createdAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2025 12:00</div>
+                        </div>
+                    </div>
+                    <div class="notification-actions" th:unless="${notification.read}">
+                        <form th:action="@{/notifications/mark-read}" method="post" style="display:inline;">
+                            <input type="hidden" name="notificationId" th:value="${notification.id}"/>
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fas fa-check"></i> Mark as Read
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+<footer class="footer">
+    <div class="container">
+        <p>© 2025 Asian Art Gallery. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://facebook.com"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+</footer>
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+       const cartCount = document.querySelector('.cart-count');
+       const notificationCount = document.querySelector('.notification-count');
+       const toastContainer = document.getElementById('toastContainer');
+
+       // Track notifications that have been shown as toasts
+       // This needs to persist between polling intervals
+       const renderedNotificationIds = new Set();
+
+       // Load initial counts
+       updateCartCount();
+       updateNotifications();
+
+       async function updateCartCount() {
+           try {
+               const response = await fetch('/cart/count');
+               if (response.ok) {
+                   const count = await response.text();
+                   cartCount.textContent = count;
+               }
+           } catch (error) {
+               console.error('Error fetching cart count:', error);
+           }
+       }
+
+       let isFetchingNotifications = false;
+       async function updateNotifications() {
+           if (isFetchingNotifications) return; // Prevent multiple fetches
+           isFetchingNotifications = true;
+           console.log('updateNotifications called at:', new Date().toISOString());
+
+           try {
+               const response = await fetch('/notifications/unread');
+               if (response.ok) {
+                   const notifications = await response.json();
+                   console.log('Fetched notifications:', notifications);
+
+                   // Only process new notifications we haven't shown yet
+                   const newNotifications = notifications.filter(notification =>
+                       !renderedNotificationIds.has(notification.id)
+                   );
+
+                   // Display new notifications as toasts
+                   newNotifications.forEach(notification => {
+                       // Add to rendered set before creating toast
+                       renderedNotificationIds.add(notification.id);
+
+                       const toast = document.createElement('div');
+                       toast.className = `toast show ${notification.type}`;
+                       toast.setAttribute('data-id', notification.id);
+                       toast.innerHTML = `
+                           <button class="close-btn" data-id="${notification.id}">
+                               <i class="fas fa-times"></i>
+                           </button>
+                           <div class="toast-header">${notification.title}</div>
+                           <div class="toast-body">
+                               <i class="fas fa-bell toast-icon"></i>
+                               ${notification.message}
+                           </div>
+                       `;
+                       console.log('Rendering notification:', notification);
+                       toastContainer.appendChild(toast);
+
+                       // Remove toast after 5 seconds but keep ID in rendered set
+                       setTimeout(() => {
+                           toast.classList.remove('show');
+                           toast.classList.add('hide');
+                           setTimeout(() => {
+                               toast.remove();
+                               // Don't remove from renderedNotificationIds to prevent re-showing
+                           }, 300);
+                       }, 5000);
+                   });
+
+                   // Update notification count
+                   notificationCount.textContent = notifications.length;
+               }
+           } catch (error) {
+               console.error('Error fetching notifications:', error);
+           } finally {
+               isFetchingNotifications = false;
+           }
+       }
+
+       // Event delegation for close buttons
+       toastContainer.addEventListener('click', async function(event) {
+           if (event.target.closest('.close-btn')) {
+               const button = event.target.closest('.close-btn');
+               const notificationId = button.getAttribute('data-id');
+               try {
+                   const response = await fetch(`/notifications/mark-read`, {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/x-www-form-urlencoded'
+                       },
+                       body: `notificationId=${notificationId}`
+                   });
+                   if (response.ok) {
+                       const toast = button.closest('.toast');
+                       toast.remove();
+                       // We don't remove from renderedNotificationIds to prevent re-showing
+
+                       // Update notification count
+                       const countResponse = await fetch('/notifications/unread');
+                       if (countResponse.ok) {
+                           const notifications = await countResponse.json();
+                           notificationCount.textContent = notifications.length;
+                       }
+                   }
+               } catch (error) {
+                   console.error('Error marking notification read:', error);
+               }
+           }
+       });
+
+       // Poll for new notifications every 15 seconds
+       setInterval(updateNotifications, 15000);
+   });
+</script>
+</body>
+</html>

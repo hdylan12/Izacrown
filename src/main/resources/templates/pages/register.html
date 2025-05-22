@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+  <style>
+    :root {
+        --primary: #ffd700;
+    }
+    body {
+        background: black;
+        font-family: 'Roboto', sans-serif;
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .card {
+        background: #1c2526;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .form-control, .input-group-text {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+    }
+    .form-control:focus {
+        background: #2a2a2a;
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 0 5px rgba(255,215,0,0.5);
+    }
+    .btn {
+        background: radial-gradient(
+            ellipse farthest-corner at right bottom,
+            #fedb37 0%,
+            #fdb931 8%,
+            #9f7928 30%,
+            #9f7928 40%,
+            transparent 80%
+        ),
+        radial-gradient(
+            ellipse farthest-corner at left top,
+            #ffffff 0%,
+            #ffffac 8%,
+            #d1b464 25%,
+            #5d4a1f 62.5%,
+            #5d4a1f 100%
+        );
+        color: white;
+    }
+    a {
+        color: var(--primary);
+    }
+    .back-btn {
+        color: var(--primary);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .back-btn:hover {
+        color: #ffeb3b;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+    }
+    .toggle-password {
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .toggle-password:hover {
+        background-color: #333333;
+    }
+    .toggle-password[title] {
+        position: relative;
+    }
+    .toggle-password[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        top: -30px;
+        right: 0;
+        background: #222222;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="card bg-dark text-white border-0 shadow">
+        <div class="card-body p-5">
+          <!-- Back Button -->
+          <a th:href="@{/landing}" class="back-btn">
+            <ion-icon name="arrow-back-outline" class="me-2"></ion-icon> Back
+          </a>
+
+          <h1 class="text-center mb-4">Create Account</h1>
+
+          <form th:action="@{/register}" th:object="${user}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <!-- First Name -->
+            <div class="mb-4">
+              <label for="firstName" class="form-label">First Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="person-outline"></ion-icon>
+                </span>
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="firstName" th:field="*{firstName}" placeholder="First name" required>
+              </div>
+              <div th:if="${#fields.hasErrors('firstName')}" class="invalid-feedback d-block">
+                <span th:errors="*{firstName}"></span>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-4">
+              <label for="lastName" class="form-label">Last Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="person-outline"></ion-icon>
+                </span>
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="lastName" th:field="*{lastName}" placeholder="Last name" required>
+              </div>
+              <div th:if="${#fields.hasErrors('lastName')}" class="invalid-feedback d-block">
+                <span th:errors="*{lastName}"></span>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+              <label for="email" class="form-label">Email</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="mail-outline"></ion-icon>
+                </span>
+                <input type="email" class="form-control bg-dark text-white border-secondary" id="email" th:field="*{email}" th:value="${savedEmail}" placeholder="Enter your email" required>
+              </div>
+              <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback d-block">
+                <span th:errors="*{email}"></span>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                </span>
+                <input type="password" class="form-control bg-dark text-white border-secondary" id="password" th:field="*{password}" placeholder="Create password" required>
+                <button type="button" class="input-group-text bg-dark text-white border-secondary toggle-password" aria-label="Toggle password visibility" title="Show/Hide Password">
+                  <ion-icon name="eye-outline" id="togglePasswordIcon"></ion-icon>
+                </button>
+              </div>
+              <div class="form-text text-white-50">Must be at least 8 characters with numbers and letters</div>
+              <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback d-block">
+                <span th:errors="*{password}"></span>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                </span>
+                <input type="password" class="form-control bg-dark text-white border-secondary" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                <button type="button" class="input-group-text bg-dark text-white border-secondary toggle-password" aria-label="Toggle password visibility" title="Show/Hide Password">
+                  <ion-icon name="eye-outline" id="toggleConfirmPasswordIcon"></ion-icon>
+                </button>
+              </div>
+              <div th:if="${errors?.confirmPassword}" class="invalid-feedback d-block">
+                <span th:text="${errors.confirmPassword}"></span>
+              </div>
+            </div>
+
+            <!-- Profile Image -->
+            <div class="mb-4 text-center">
+              <label for="profileImage" class="form-label">Profile Image</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="image-outline"></ion-icon>
+                </span>
+                <input type="file" class="form-control bg-dark text-white border-secondary" id="profileImage" name="profileImage" accept="image/*">
+              </div>
+              <div class="form-text text-white-50">Supported formats: JPG, PNG, GIF (Max 5MB)</div>
+            </div>
+
+            <!-- Address -->
+            <div class="mb-4">
+              <label for="address" class="form-label">Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="home-outline"></ion-icon>
+                </span>
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="address" th:field="*{address}" placeholder="Street address">
+              </div>
+              <div th:if="${#fields.hasErrors('address')}" class="invalid-feedback d-block">
+                <span th:errors="*{address}"></span>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="mb-4">
+              <label for="city" class="form-label">City</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="business-outline"></ion-icon>
+                </span>
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="city" th:field="*{city}" placeholder="City">
+              </div>
+              <div th:if="${#fields.hasErrors('city')}" class="invalid-feedback d-block">
+                <span th:errors="*{city}"></span>
+              </div>
+            </div>
+
+            <!-- Zip Code -->
+            <div class="mb-4">
+              <label for="zipCode" class="form-label">Zip Code</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="location-outline"></ion-icon>
+                </span>
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="zipCode" th:field="*{zipCode}" placeholder="Zip code">
+              </div>
+              <div th:if="${#fields.hasErrors('zipCode')}" class="invalid-feedback d-block">
+                <span th:errors="*{zipCode}"></span>
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="mb-4">
+              <label for="phone" class="form-label">Phone Number</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-white border-secondary">
+                    <ion-icon name="call-outline"></ion-icon>
+                </span>
+                <input type="tel" class="form-control bg-dark text-white border-secondary" id="phone" th:field="*{phone}" placeholder="Phone number">
+              </div>
+              <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback d-block">
+                <span th:errors="*{phone}"></span>
+              </div>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error != null}" class="alert alert-danger" role="alert">
+              <span th:text="${error}"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn w-100 py-2 mt-3">Register</button>
+          </form>
+          <div class="text-center mt-4">
+            <p>Already have an account? <a th:href="@{/login}" style="color: var(--primary);">Login here</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Prevent form resubmission on page refresh
+  if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+  }
+
+  // Toggle password visibility for both fields
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function () {
+      const input = this.previousElementSibling;
+      const toggleIcon = this.querySelector('ion-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggleIcon.setAttribute('name', 'eye-off-outline');
+      } else {
+        input.type = 'password';
+        toggleIcon.setAttribute('name', 'eye-outline');
+      }
+    });
+  });
+
+  // Bootstrap form validation
+  window.addEventListener('load', () => {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  });
+</script>
+</body>
+</html>

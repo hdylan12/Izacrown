@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Analytics Dashboard</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --red-primary: #A22B2B;
+            --red-accent: #D32F2F;
+            --gold-primary: #B8860B;
+            --gold-accent: #DAA520;
+            --black-primary: #1C2526;
+            --black-secondary: #2E3532;
+            --white-primary: #F5F5F5;
+            --white-secondary: #E0E0E0;
+            --text-primary: #F5F5F5;
+            --text-secondary: #D0D0D0;
+            --text-muted: #A0A0A0;
+            --success: #388E3C;
+            --danger: #C62828;
+            --info: #17A2B8;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-width: 1px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --transition-fast: 0.2s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+        }
+
+        body {
+            background-color: var(--black-primary);
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', 'Playfair Display', serif;
+            line-height: 1.6;
+            margin: 0;
+            min-height: 100vh;
+            font-size: var(--font-size-md);
+        }
+
+        h1, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: var(--font-size-xl);
+            display: flex;
+            align-items: center;
+        }
+
+        h1 .title-icon {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+            font-size: 1.8rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: var(--space-lg) auto;
+            padding: var(--space-lg);
+            background-color: var(--black-secondary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .horizontal-header {
+            background-color: var(--black-secondary);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            padding: var(--space-md) var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-brand .brand-logo {
+            color: var(--gold-primary);
+            font-size: 1.6rem;
+            margin-right: var(--space-sm);
+        }
+
+        .header-brand .brand-name {
+            color: var(--text-primary);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1.3rem;
+            transition: var(--transition-fast);
+        }
+
+        .header-brand:hover .brand-name {
+            color: var(--gold-accent);
+        }
+
+        .header-center {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-nav {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .main-nav-item {
+            margin: 0 var(--space-sm);
+        }
+
+        .main-nav-link {
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition-fast);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+        }
+
+        .main-nav-link:hover {
+            color: var(--text-primary);
+            background-color: rgba(184, 134, 11, 0.1);
+        }
+
+        .main-nav-link.active {
+            color: var(--gold-accent);
+            background-color: rgba(184, 134, 11, 0.15);
+            position: relative;
+        }
+
+        .main-nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background-color: var(--gold-accent);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 1px solid transparent;
+            margin-right: var(--space-md);
+            position: relative;
+        }
+
+        .header-user:hover {
+            background-color: var(--black-primary);
+            border-color: rgba(184, 134, 11, 0.2);
+        }
+
+        .header-user-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gold-primary);
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-user-info {
+            margin-left: var(--space-sm);
+        }
+
+        .header-user-name {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .header-user-role {
+            font-size: 0.75rem;
+            color: var(--gold-accent);
+            margin: 0;
+        }
+
+        .header-logout {
+            padding: var(--space-sm) var(--space-md);
+            color: var(--text-secondary);
+            transition: var(--transition-fast);
+            border-radius: var(--border-radius-sm);
+            text-decoration: none;
+        }
+
+        .header-logout:hover {
+            color: var(--text-primary);
+            background-color: rgba(198, 40, 40, 0.1);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            width: 300px;
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .profile-dropdown.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: var(--space-md);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-header i {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+        }
+
+        .dropdown-body {
+            padding: var(--space-md);
+        }
+
+        .card {
+            background-color: var(--black-primary);
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-header {
+            background-color: rgba(184, 134, 11, 0.05);
+            color: var(--text-primary);
+            font-weight: 500;
+            border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+            padding: var(--space-md);
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header i {
+            color: var(--gold-primary);
+            margin-right: var(--space-sm);
+        }
+
+        .card-body {
+            padding: var(--space-md);
+        }
+
+        .chart-container {
+            position: relative;
+            max-width: 100%;
+            height: 400px;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: var(--space-sm);
+        }
+
+        @media (max-width: 991px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .header-center {
+                order: 3;
+                width: 100%;
+                margin-top: var(--space-sm);
+                justify-content: flex-start;
+            }
+
+            .main-nav {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .main-nav-item {
+                margin: var(--space-xs) 0;
+            }
+
+            .header-center.collapsed {
+                display: none;
+            }
+
+            .header-right {
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            .header-user-info {
+                display: none;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="horizontal-header">
+    <div class="header-brand">
+        <i class="fas fa-paint-brush brand-logo"></i>
+        <h1 class="brand-name">Asian Art Gallery Admin</h1>
+    </div>
+
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="header-center" id="headerNav">
+        <ul class="main-nav">
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin}" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/artworks}" th:classappend="${currentPage == 'artworks'} ? 'active' : ''">
+                    <i class="fas fa-image"></i> Artworks
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/products}" th:classappend="${currentPage == 'products'} ? 'active' : ''">
+                    <i class="fas fa-box"></i> Products
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/orders}" th:classappend="${currentPage == 'orders'} ? 'active' : ''">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/clients}" th:classappend="${currentPage == 'customers'} ? 'active' : ''">
+                    <i class="fas fa-users"></i> Customers
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/promotions}" th:classappend="${currentPage == 'promotions'} ? 'active' : ''">
+                    <i class="fas fa-tag"></i> Promotions
+                </a>
+            </li>
+            <li class="main-nav-item">
+                <a class="main-nav-link" th:href="@{/admin/analytics}" th:classappend="${currentPage == 'analytics'} ? 'active' : ''">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="header-right">
+        <div class="header-user" id="profileTrigger">
+            <img th:src="${profileImage}" class="header-user-img" id="profileImageTrigger"
+                 th:alt="${user != null ? user.firstName + ' ' + user.lastName : 'Profile Picture'}"
+                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click to manage profile"/>
+            <div class="header-user-info">
+                <p class="header-user-name" th:text="${user != null ? user.firstName + ' ' + user.lastName : 'Admin User'}">Admin User</p>
+                <p class="header-user-role">Administrator</p>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-header">
+                    <i class="fas fa-user-circle"></i> Profile Settings
+                </div>
+                <div class="dropdown-body">
+                    <form th:action="@{/admin/upload-profile-image}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Update Profile Picture</label>
+                            <input type="file" class="form-control d-none" id="file" name="file" accept="image/*" required>
+                            <div class="custom-file-upload" id="upload-area">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div class="upload-text">Click or drag to upload</div>
+                                <div class="upload-hint">JPG, PNG, GIF up to 5MB</div>
+                            </div>
+                            <img id="imagePreview" src="#" alt="Image Preview"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i> Update Picture
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <a class="header-logout" th:href="@{/logout}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</header>
+
+<main class="admin-content">
+    <div class="container">
+        <h1>
+            <i class="fas fa-chart-line title-icon"></i>
+            <span th:text="${pageTitle}">Analytics Dashboard</span>
+        </h1>
+
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle alert-icon"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line"></i> Total Orders Over Time
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-box"></i> Artworks by Category
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <p>© 2025 Asian Art Gallery Admin. All rights reserved.</p>
+    </div>
+</footer>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script th:inline="javascript">
+    // Profile dropdown, image upload, mobile menu, and tooltips
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profileDropdown = document.getElementById('profileDropdown');
+    profileTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.remove('show');
+        }
+    });
+
+    const fileInput = document.getElementById('file');
+    const uploadArea = document.getElementById('upload-area');
+    const preview = document.getElementById('imagePreview');
+    const profileImageTrigger = document.getElementById('profileImageTrigger');
+
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--gold-accent)';
+    });
+
+    uploadArea.addEventListener('dragleave', function() {
+        uploadArea.style.borderColor = 'rgba(184, 134, 11, 0.3)';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'rgba(184, 134, 11, 0.3)';
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file (JPG, PNG, GIF).');
+                fileInput.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size exceeds 5MB limit.');
+                fileInput.value = '';
+                return;
+            }
+            handleFileSelect(file);
+        }
+    });
+
+    function handleFileSelect(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            profileImageTrigger.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const headerNav = document.getElementById('headerNav');
+    mobileMenuToggle.addEventListener('click', function() {
+        headerNav.classList.toggle('collapsed');
+    });
+
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Chart.js configurations
+    /*<![CDATA[*/
+    const ordersData = {
+        labels: /*[[${ordersData.labels != null && ordersData.labels.size() > 0 ? ordersData.labels : ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025']}]]*/ ['Jan 2025', 'Feb 2025', 'Mar 2025', 'Apr 2025', 'May 2025'],
+        values: /*[[${ordersData.values != null && ordersData.values.size() > 0 ? ordersData.values : [0, 0, 0, 0, 0]}]]*/ [0, 0, 0, 0, 0]
+    };
+
+    const categoryData = {
+        labels: /*[[${categoryData.labels != null && categoryData.labels.size() > 0 ? categoryData.labels : ['Painting', 'Sculpture', 'Ceramics']}]]*/ ['Painting', 'Sculpture', 'Ceramics'],
+        values: /*[[${categoryData.values != null && categoryData.values.size() > 0 ? categoryData.values : [0, 0, 0]}]]*/ [0, 0, 0]
+    };
+    /*]]>*/
+
+    console.log('Orders Data:', ordersData);
+    console.log('Revenue Data:', revenueData);
+    console.log('Category Data:', categoryData);
+
+    const chartOptions = {
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#F5F5F5',
+                    font: { size: 14 }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(28, 37, 38, 0.8)',
+                titleColor: '#F5F5F5',
+                bodyColor: '#F5F5F5',
+                borderColor: '#B8860B',
+                borderWidth: 1
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: '#F5F5F5' },
+                grid: { color: 'rgba(184, 134, 11, 0.2)' }
+            },
+            y: {
+                ticks: { color: '#F5F5F5' },
+                grid: { color: 'rgba(184, 134, 11, 0.2)' },
+                beginAtZero: true
+            }
+        }
+    };
+
+    // Orders Line Chart
+    new Chart(document.getElementById('ordersChart'), {
+        type: 'line',
+        data: {
+            labels: ordersData.labels,
+            datasets: [{
+                label: 'Total Orders',
+                data: ordersData.values,
+                borderColor: '#DAA520',
+                backgroundColor: 'rgba(218, 165, 32, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: chartOptions.plugins,
+            scales: chartOptions.scales
+        }
+    });
+
+
+    // Category Pie Chart
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: categoryData.labels,
+            datasets: [{
+                label: 'Artworks by Category',
+                data: categoryData.values,
+                backgroundColor: ['#DAA520', '#A22B2B', '#388E3C', '#17A2B8'],
+                borderColor: '#1C2526',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#F5F5F5',
+                        font: { size: 14 }
+                    },
+                    position: 'right'
+                },
+                tooltip: chartOptions.plugins.tooltip
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - Asian Art Gallery</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --red-primary: #A22B2B;
+        --red-accent: #D32F2F;
+        --gold-primary: #B8860B;
+        --gold-accent: #DAA520;
+        --black-primary: #1C2526;
+        --black-secondary: #2E3532;
+        --white-primary: #F5F5F5;
+        --white-secondary: #E0E0E0;
+        --text-primary: #F5F5F5;
+        --text-secondary: #D0D0D0;
+        --text-muted: #A0A0A0;
+        --success: #388E3C;
+        --danger: #C62828;
+        --info: #17A2B8;
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --font-size-sm: 0.875rem;
+        --font-size-md: 1rem;
+        --font-size-lg: 1.25rem;
+        --font-size-xl: 1.5rem;
+        --border-radius-sm: 4px;
+        --border-radius-md: 8px;
+        --border-width: 1px;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+        --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+        --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+        --transition-fast: 0.2s ease-in-out;
+        --transition-normal: 0.3s ease-in-out;
+    }
+    body {
+        background-color: var(--black-primary);
+        color: var(--text-primary);
+        font-family: 'Noto Serif SC', serif;
+        line-height: 1.6;
+        margin: 0;
+        min-height: 100vh;
+        font-size: var(--font-size-md);
+    }
+    h1 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: var(--space-md);
+        font-size: var(--font-size-xl);
+        display: flex;
+        align-items: center;
+    }
+    h1 .title-icon {
+        color: var(--gold-primary);
+        margin-right: var(--space-sm);
+        font-size: 1.8rem;
+        transition: var(--transition-fast);
+    }
+    h1 .title-icon:hover {
+        color: var(--gold-accent);
+    }
+    .header {
+        background: linear-gradient(180deg, var(--black-secondary), var(--black-primary));
+        border-bottom: var(--border-width) solid rgba(184, 134, 11, 0.2);
+        padding: var(--space-md) var(--space-lg);
+        box-shadow: var(--shadow-sm);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+    }
+    .header-brand {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .header-brand .brand-logo {
+        color: var(--gold-primary);
+        font-size: 1.6rem;
+        margin-right: var(--space-sm);
+        transition: var(--transition-fast);
+    }
+    .header-brand .brand-name {
+        color: var(--text-primary);
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        font-size: 1.3rem;
+        text-decoration: none;
+        transition: var(--transition-fast);
+    }
+    .header-brand:hover .brand-name,
+    .header-brand:hover .brand-logo {
+        color: var(--gold-accent);
+    }
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        flex-shrink: 0;
+    }
+    .nav-links {
+        display: flex;
+        gap: var(--space-md);
+        margin-right: var(--space-lg);
+    }
+    .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+        transition: var(--transition-fast);
+    }
+    .nav-links a:hover {
+        color: var(--gold-accent);
+    }
+    .cart-icon {
+        position: relative;
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        transition: var(--transition-fast);
+    }
+    .cart-icon:hover {
+        color: var(--gold-accent);
+    }
+    .cart-count {
+        position: absolute;
+        top: -8px;
+        right: -10px;
+        background-color: var(--gold-primary);
+        color: var(--black-primary);
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    .container {
+        max-width: 800px;
+        margin: var(--space-xl) auto;
+        padding: var(--space-lg);
+        background-color: var(--black-secondary);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        text-align: center;
+    }
+    .confirmation-content {
+        padding: var(--space-lg);
+        border: var(--border-width) solid rgba(184, 134, 11, 0.2);
+        border-radius: var(--border-radius-md);
+        background-color: var(--black-primary);
+    }
+    .alert-success {
+        background-color: rgba(56, 142, 60, 0.1);
+        border-color: rgba(56, 142, 60, 0.2);
+        color: var(--text-primary);
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
+        border-radius: var(--border-radius-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: var(--font-size-md);
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    .alert-success i {
+        color: var(--success);
+        font-size: 1.5rem;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .btn {
+        font-weight: 500;
+        border-radius: var(--border-radius-sm);
+        padding: var(--space-sm) var(--space-lg);
+        transition: var(--transition-fast);
+        font-size: var(--font-size-sm);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: var(--space-sm);
+    }
+    .btn-primary {
+        background-color: var(--gold-primary);
+        border-color: var(--gold-primary);
+        color: var(--black-primary);
+    }
+    .btn-primary:hover {
+        background-color: var(--gold-accent);
+        border-color: var(--gold-accent);
+        transform: scale(1.05);
+    }
+    .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--gold-primary);
+        color: var(--gold-primary);
+    }
+    .btn-secondary:hover {
+        background-color: rgba(184, 134, 11, 0.1);
+        color: var(--gold-accent);
+        border-color: var(--gold-accent);
+        transform: scale(1.05);
+    }
+    .confirmation-text {
+        font-size: var(--font-size-md);
+        color: var(--text-secondary);
+        margin-bottom: var(--space-lg);
+    }
+    .footer {
+        background-color: var(--black-secondary);
+        padding: var(--space-lg);
+        border-top: var(--border-width) solid rgba(184, 134, 11, 0.2);
+        text-align: center;
+        margin-top: var(--space-xl);
+    }
+    .footer p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+    }
+    .social-links {
+        margin-top: var(--space-md);
+        display: flex;
+        justify-content: center;
+        gap: var(--space-md);
+    }
+    .social-links a {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        transition: var(--transition-fast);
+    }
+    .social-links a:hover {
+        color: var(--gold-accent);
+    }
+    @media (max-width: 768px) {
+        .container {
+            margin: var(--space-lg) var(--space-md);
+            padding: var(--space-md);
+        }
+        .confirmation-content {
+            padding: var(--space-md);
+        }
+        .header {
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+        .header-right {
+            margin-left: auto;
+        }
+        .nav-links {
+            margin-right: var(--space-md);
+        }
+    }
+    @media (max-width: 576px) {
+        h1 {
+            font-size: var(--font-size-lg);
+        }
+        .btn {
+            padding: var(--space-xs) var(--space-md);
+            width: 100%;
+            margin: var(--space-xs) 0;
+        }
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .header-right {
+            margin-left: 0;
+            margin-top: var(--space-sm);
+        }
+        .nav-links {
+            flex-direction: column;
+            margin-right: 0;
+        }
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <i class="fas fa-paint-brush brand-logo"></i>
+    <a href="/shop" class="brand-name">Asian Art Gallery</a>
+  </div>
+  <div class="header-right">
+    <div class="nav-links">
+      <a href="/shop">Shop</a>
+      <a href="/cart">Cart</a>
+      <a href="/account">Account</a>
+    </div>
+    <a th:href="@{/cart}" class="cart-icon">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-count" th:text="${cartCount}">0</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="confirmation-content">
+      <h1>
+        <i class="fas fa-check-circle title-icon"></i>
+        Order Confirmation
+      </h1>
+      <div th:if="${success}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${success}"></span>
+      </div>
+      <p class="confirmation-text">
+        Thank you for your purchase! You'll receive an email confirmation soon.
+        Track your order status in your account or continue shopping.
+      </p>
+      <div class="confirmation-actions">
+        <a href="/shop" class="btn btn-primary">
+          <i class="fas fa-shopping-bag"></i> Continue Shopping
+        </a>
+        <a href="/account/orders" class="btn btn-secondary">
+          <i class="fas fa-list"></i> View Orders
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2025 Asian Art Gallery. All rights reserved.</p>
+    <div class="social-links">
+      <a href="https://facebook.com"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://twitter.com"><i class="fab fa-twitter"></i></a>
+      <a href="https://instagram.com"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const cartCount = document.querySelector('.cart-count');
+
+      async function updateCartCount() {
+          try {
+              const response = await fetch('/cart/count');
+              if (response.ok) {
+                  const count = await response.text();
+                  cartCount.textContent = count;
+              } else {
+                  cartCount.textContent = '0';
+              }
+          } catch (error) {
+              console.error('Error fetching cart count:', error);
+              cartCount.textContent = '0';
+          }
+      }
+
+      updateCartCount();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        :root {
+            --primary: #ffd700;
+        }
+
+        body {
+            background: black;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 100px;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3em;
+            color: white;
+            letter-spacing: 2px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .login {
+            padding: 100px 0;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: #111111;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control, .input-group-text {
+            background: #222222;
+            border-color: #444444;
+            color: white;
+        }
+
+        .form-control::placeholder {
+            color: #aaaaaa;
+        }
+
+        .btn {
+            background: radial-gradient(
+                ellipse farthest-corner at right bottom,
+                #fedb37 0%,
+                #fdb931 8%,
+                #9f7928 30%,
+                #9f7928 40%,
+                transparent 80%
+            ),
+            radial-gradient(
+                ellipse farthest-corner at left top,
+                #ffffff 0%,
+                #ffffac 8%,
+                #d1b464 25%,
+                #5d4a1f 62.5%,
+                #5d4a1f 100%
+            );
+            color: white;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: radial-gradient(
+                ellipse farthest-corner at left top,
+                #fedb37 0%,
+                #fdb931 8%,
+                #9f7928 30%,
+                #9f7928 40%,
+                transparent 80%
+            ),
+            radial-gradient(
+                ellipse farthest-corner at right bottom,
+                #ffffff 0%,
+                #ffffac 8%,
+                #d1b464 25%,
+                #5d4a1f 62.5%,
+                #5d4a1f 100%
+            );
+        }
+
+        a {
+            color: var(--primary);
+        }
+
+        a:hover {
+            color: #ffeb3b;
+        }
+
+        .back-btn {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn:hover {
+            color: #ffeb3b;
+        }
+
+        .alert-danger {
+            background: #ff4d4d;
+            border: none;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: #28a745;
+            border: none;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-password:hover {
+            background-color: #333333;
+        }
+
+        .toggle-password[title] {
+            position: relative;
+        }
+
+        .toggle-password[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background: #222222;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 30px;
+            }
+
+            .login {
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a th:href="@{/landing}" class="logo">Art Gallery</a>
+</header>
+
+<section id="login" class="login py-5">
+    <div class="section-content container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card bg-dark text-white border-0 shadow">
+                    <div class="card-body p-5">
+                        <!-- Back Button -->
+                        <a th:href="@{/landing}" class="back-btn">
+                            <ion-icon name="arrow-back-outline" class="me-2"></ion-icon> Back
+                        </a>
+
+                        <h1 class="text-center mb-4">Login</h1>
+
+                        <!-- Error Message -->
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <!-- Logout Message -->
+                        <div th:if="${logoutMessage}" class="alert alert-success" role="alert">
+                            <span th:text="${logoutMessage}"></span>
+                        </div>
+
+                        <form th:action="@{/login}" method="post" id="loginForm">
+                            <div class="mb-4">
+                                <label for="loginEmail" class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-white border-secondary">
+                                        <ion-icon name="mail-outline"></ion-icon>
+                                    </span>
+                                    <input type="email" class="form-control bg-dark text-white border-secondary"
+                                           id="loginEmail" name="email" required placeholder="Enter your email">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="loginPassword" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-white border-secondary">
+                                        <ion-icon name="lock-closed-outline"></ion-icon>
+                                    </span>
+                                    <input type="password" class="form-control bg-dark text-white border-secondary"
+                                           id="loginPassword" name="password" required placeholder="Enter your password">
+                                    <button type="button" class="input-group-text bg-dark text-white border-secondary toggle-password" aria-label="Toggle password visibility" title="Show/Hide Password">
+                                        <ion-icon name="eye-outline" id="togglePasswordIcon"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <a th:href ="@{/forgot-password}" class="text-decoration-none" style="color: var(--primary);">Forgot password?</a>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn w-100 py-2 mt-3">Login</button>
+                        </form>
+                        <div class="text-center mt-4">
+                            <p>Don't have an account?
+                                <a th:href="@{/register}" class="text-decoration-none" style="color: var(--primary);">Register here</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+<script>
+    // Toggle password visibility
+    document.querySelector('.toggle-password').addEventListener('click', function () {
+        const passwordInput = document.getElementById('loginPassword');
+        const toggleIcon = document.getElementById('togglePasswordIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.setAttribute('name', 'eye-off-outline');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.setAttribute('name', 'eye-outline');
+        }
+    });
+
+    // Cookie functions with additional security
+    function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Lax";
+    }
+
+    function getCookie(name) {
+        const cookieName = name + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
+
+        for (let i = 0; i < cookieArray.length; i++) {
+            let cookie = cookieArray[i].trim();
+            if (cookie.indexOf(cookieName) === 0) {
+                return cookie.substring(cookieName.length, cookie.length);
+            }
+        }
+        return "";
+    }
+
+    // Add submit event listener to handle remember me functionality
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const email = document.getElementById('loginEmail').value;
+        const rememberMeCheckbox = document.getElementById('rememberMe');
+
+        if (rememberMeCheckbox.checked) {
+            // Save email in cookie for 30 days
+            setCookie('rememberEmail', email, 30);
+        } else {
+            // Remove the cookie if remember me is unchecked
+            setCookie('rememberEmail', '', -1);
+        }
+    });
+
+    // Load saved email if cookie exists
+    function loadSavedEmail() {
+        const savedEmail = getCookie('rememberEmail');
+        if (savedEmail) {
+            document.getElementById('loginEmail').value = savedEmail;
+            document.getElementById('rememberMe').checked = true;
+        }
+    }
+
+    // Run immediately
+    loadSavedEmail();
+
+    // Also run on DOMContentLoaded as backup
+    document.addEventListener('DOMContentLoaded', loadSavedEmail);
+</script>
+</body>
+</html>
+</script>
+</body>
+</html>

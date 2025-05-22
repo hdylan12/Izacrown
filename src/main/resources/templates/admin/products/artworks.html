@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${pageTitle ?: 'Artworks'}">Artworks</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.2/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red-primary: #A22B2B;
+      --red-accent: #D32F2F;
+      --gold-primary: #B8860B;
+      --gold-accent: #DAA520;
+      --black-primary: #1C2526;
+      --black-secondary: #2E3532;
+      --black-tertiary: #343E40;
+      --white-primary: #F5F5F5;
+      --white-secondary: #E0E0E0;
+      --text-primary: #F5F5F5;
+      --text-secondary: #D0D0D0;
+      --text-muted: #A0A0A0;
+      --success: #388E3C;
+      --danger: #C62828;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --font-size-sm: 0.875rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.25rem;
+      --font-size-xl: 1.5rem;
+      --border-radius-sm: 4px;
+      --border-radius-md: 8px;
+      --border-width: 1px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+      --shadow-md: 0 4px 8px rgba(0,0,0,0.12);
+      --transition-fast: 0.2s ease-in-out;
+      --transition-normal: 0.3s ease-in-out;
+    }
+    body {
+      background-color: var(--black-primary);
+      color: var(--text-primary);
+      font-family: 'Noto Serif SC', 'Playfair Display', serif;
+      line-height: 1.6;
+      margin: 0;
+      min-height: 100vh;
+      font-size: var(--font-size-md);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    .admin-header {
+      background-color: var(--black-secondary);
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-md);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+      position: relative;
+    }
+    .admin-header::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-accent), var(--gold-primary));
+    }
+    .admin-header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      text-decoration: none;
+    }
+    .admin-header__icon {
+      color: var(--gold-primary);
+      font-size: 1.25rem;
+    }
+    .admin-header__title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .admin-header__nav {
+      display: flex;
+      gap: var(--space-md);
+    }
+    .admin-header__link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--border-radius-sm);
+      transition: var(--transition-fast);
+      font-size: var(--font-size-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .admin-header__link.active {
+      color: var(--gold-accent);
+      background-color: rgba(184, 134, 11, 0.1);
+    }
+    .admin-header__link:hover {
+      color: var(--gold-accent);
+      background-color: rgba(184, 134, 11, 0.1);
+    }
+    .admin-content {
+      padding: var(--space-lg) 0;
+    }
+    h1 {
+      font-size: var(--font-size-xl);
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      color: var(--gold-primary);
+      margin-bottom: var(--space-lg);
+    }
+    h1 .title-icon {
+      color: var(--gold-primary);
+      margin-right: var(--space-sm);
+      font-size: 1.8rem;
+    }
+    .search-container {
+      background-color: var(--black-secondary);
+      padding: var(--space-lg);
+      border-radius: var(--border-radius-md);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-xl);
+      position: relative;
+    }
+    .search-container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-accent), var(--gold-primary));
+    }
+    .search-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      align-items: flex-end;
+    }
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    .form-label {
+      font-size: var(--font-size-sm);
+      color: var(--gold-primary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .form-control {
+      background-color: var(--black-tertiary);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+      color: var(--text-primary);
+      padding: 10px;
+      border-radius: var(--border-radius-sm);
+      font-family: inherit;
+      transition: var(--transition-fast);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--gold-accent);
+      box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.2);
+    }
+    .search-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: var(--border-radius-sm);
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      border: none;
+    }
+    .btn-primary {
+      background-color: var(--gold-primary);
+      color: var(--black-primary);
+    }
+    .btn-primary:hover {
+      background-color: var(--gold-accent);
+    }
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-primary);
+    }
+    .btn-outline:hover {
+      background-color: rgba(184, 134, 11, 0.1);
+    }
+    .alert {
+      padding: var(--space-md);
+      margin-bottom: var(--space-lg);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+    }
+    .alert-success {
+      background-color: rgba(56, 142, 60, 0.1);
+      border: 1px solid var(--success);
+      color: var(--text-primary);
+    }
+    .alert-danger {
+      background-color: rgba(198, 40, 40, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--text-primary);
+    }
+    .alert-info {
+      background-color: rgba(23, 162, 184, 0.1);
+      border: 1px solid rgba(23, 162, 184, 0.2);
+      color: var(--text-primary);
+    }
+    .alert-icon {
+      font-size: 1.25rem;
+    }
+    .artwork-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+    .artwork-view-options {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    .view-btn {
+      background-color: var(--black-secondary);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+    .view-btn.active {
+      background-color: rgba(184, 134, 11, 0.2);
+      color: var(--gold-primary);
+      border-color: var(--gold-primary);
+    }
+    .view-btn:hover:not(.active) {
+      background-color: rgba(184, 134, 11, 0.1);
+      color: var(--gold-accent);
+    }
+    .artwork-sort {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .artwork-sort-label {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+    .artwork-sort-select {
+      background-color: var(--black-secondary);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+      color: var(--text-primary);
+      padding: 8px 12px;
+      border-radius: var(--border-radius-sm);
+      font-family: inherit;
+      transition: var(--transition-fast);
+    }
+    .artwork-sort-select:focus {
+      outline: none;
+      border-color: var(--gold-accent);
+    }
+    .artwork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+    .artwork-grid.list {
+      grid-template-columns: 1fr;
+    }
+    .artwork-card {
+      background-color: var(--black-secondary);
+      border-radius: var(--border-radius-md);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .artwork-grid.list .artwork-card {
+      flex-direction: row;
+      align-items: center;
+    }
+    .artwork-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+    .artwork-card:hover::after {
+      opacity: 1;
+    }
+    .artwork-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-accent), var(--gold-primary));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .artwork-image-container {
+      position: relative;
+      padding-top: 75%;
+      background-color: var(--black-tertiary);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.15);
+      overflow: hidden;
+    }
+    .artwork-grid.list .artwork-image-container {
+      padding-top: 0;
+      width: 200px;
+      height: 150px;
+      flex-shrink: 0;
+    }
+    .artwork-card__image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.5s ease;
+    }
+    .artwork-card:hover .artwork-card__image {
+      transform: scale(1.05);
+    }
+    .artwork-status {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      z-index: 1;
+    }
+    .artwork-status.in-stock {
+      background-color: var(--success);
+      color: var(--white-primary);
+    }
+    .artwork-status.sold-out {
+      background-color: var(--danger);
+      color: var(--white-primary);
+    }
+    .artwork-card__body {
+      padding: var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .artwork-grid.list .artwork-card__body {
+      flex: 1;
+    }
+    .artwork-card__title {
+      margin: 0 0 var(--space-sm);
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-size-lg);
+      font-weight: 500;
+      color: var(--white-primary);
+      line-height: 1.3;
+    }
+    .artwork-meta {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .artwork-meta-label {
+      color: var(--gold-primary);
+      font-size: var(--font-size-sm);
+      white-space: nowrap;
+    }
+    .artwork-meta-value {
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+    .artwork-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: var(--space-md);
+      border-top: 1px solid rgba(184, 134, 11, 0.15);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .artwork-grid.list .artwork-footer {
+      flex-wrap: nowrap;
+    }
+    .artwork-card__price {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      color: var(--gold-accent);
+      font-family: 'Playfair Display', serif;
+    }
+    .artwork-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    .artwork-action-btn {
+      background-color: rgba(184, 134, 11, 0.1);
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      color: var(--gold-primary);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-fast);
+      cursor: pointer;
+    }
+    .artwork-action-btn:hover {
+      background-color: rgba(184, 134, 11, 0.2);
+      border-color: var(--gold-primary);
+      color: var(--gold-accent);
+    }
+    .stock-form {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .stock-input {
+      width: 80px;
+      background-color: var(--black-tertiary);
+      border: 1px solid rgba(184, 134, 11, 0.3);
+      color: var(--text-primary);
+      padding: 5px;
+      border-radius: var(--border-radius-sm);
+      font-size: var(--font-size-sm);
+    }
+    .stock-input:focus {
+      outline: none;
+      border-color: var(--gold-accent);
+      box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.2);
+    }
+    .stock-btn {
+      background-color: var(--gold-primary);
+      color: var(--black-primary);
+      padding: 5px 10px;
+      border-radius: var(--border-radius-sm);
+      font-size: var(--font-size-sm);
+      transition: var(--transition-fast);
+    }
+    .stock-btn:hover {
+      background-color: var(--gold-accent);
+    }
+    .stock-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .stock-btn .spinner {
+      display: none;
+      width: 0.8rem;
+      height: 0.8rem;
+      border: 2px solid var(--black-primary);
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: var(--space-xs);
+    }
+    .stock-btn:disabled .spinner {
+      display: inline-block;
+    }
+    .empty-state {
+      background-color: var(--black-secondary);
+      border-radius: var(--border-radius-md);
+      padding: var(--space-xl);
+      text-align: center;
+      border: 1px dashed rgba(184, 134, 11, 0.3);
+    }
+    .empty-state-icon {
+      font-size: 3rem;
+      color: var(--gold-primary);
+      opacity: 0.5;
+      margin-bottom: var(--space-md);
+    }
+    .empty-state-title {
+      color: var(--text-primary);
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--space-sm);
+      font-family: 'Playfair Display', serif;
+    }
+    .empty-state-message {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-lg);
+      font-size: var(--font-size-md);
+    }
+    .empty-state-action {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background-color: var(--gold-primary);
+      color: var(--black-primary);
+      padding: 10px 20px;
+      border-radius: var(--border-radius-sm);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition-fast);
+    }
+    .empty-state-action:hover {
+      background-color: var(--gold-accent);
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xs);
+      margin-top: var(--space-xl);
+    }
+    .page-item {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--black-secondary);
+      border: 1px solid var(--gold-primary);
+      border-radius: var(--border-radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      font-family: 'Playfair Display', serif;
+      text-decoration: none;
+    }
+    .page-item.active {
+      background-color: rgba(184, 134, 11, 0.2);
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+    }
+    .page-item:hover:not(.active):not(.disabled) {
+      background-color: rgba(184, 134, 11, 0.1);
+      color: var(--gold-accent);
+    }
+    .page-item.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    footer {
+      background-color: var(--black-secondary);
+      border-top: 1px solid rgba(184, 134, 11, 0.1);
+      padding: var(--space-md) 0;
+      text-align: center;
+      font-size: var(--font-size-sm);
+      color: var(--text-muted);
+      margin-top: var(--space-xl);
+    }
+    @media (max-width: 768px) {
+      .search-form {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .form-group {
+        min-width: 100%;
+      }
+      .search-actions {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+      .btn {
+        width: 100%;
+      }
+      .artwork-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+      }
+      .artwork-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+      .artwork-grid.list .artwork-card {
+        flex-direction: column;
+      }
+      .artwork-grid.list .artwork-image-container {
+        width: 100%;
+        padding-top: 75%;
+      }
+      .artwork-footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .stock-form {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    @media (max-width: 576px) {
+      .artwork-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .modal-content {
+      background-color: var(--black-secondary);
+      border: 2px solid var(--gold-primary);
+      border-radius: var(--border-radius-md);
+      color: var(--text-primary);
+      font-family: 'Noto Serif SC', serif;
+    }
+    .modal-dialog {
+      max-width: 400px;
+    }
+    .modal-header {
+      border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+      padding: var(--space-sm) var(--space-md);
+    }
+    .modal-title {
+      color: var(--gold-primary);
+      font-family: 'Playfair Display', serif;
+      font-size: var(--font-size-lg);
+    }
+    .modal-body {
+      color: var(--text-secondary);
+      padding: var(--space-md);
+      font-size: var(--font-size-sm);
+    }
+    .modal-footer {
+      border-top: 1px solid rgba(184, 134, 11, 0.3);
+      padding: var(--space-sm) var(--space-md);
+      justify-content: flex-end;
+    }
+    .btn-danger {
+      background-color: var(--red-primary);
+      border-color: var(--red-primary);
+      color: var(--white-primary);
+      font-size: var(--font-size-sm);
+      padding: var(--space-xs) var(--space-md);
+    }
+    .btn-danger:hover {
+      background-color: var(--red-accent);
+      border-color: var(--red-accent);
+    }
+    .btn-danger:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background-color: var(--black-tertiary);
+      border-color: rgba(184, 134, 11, 0.3);
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+      padding: var(--space-xs) var(--space-md);
+    }
+    .btn-secondary:hover {
+      background-color: rgba(184, 134, 11, 0.1);
+      color: var(--gold-accent);
+    }
+    .spinner {
+      display: none;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid var(--white-primary);
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: var(--space-xs);
+    }
+    .btn-danger:disabled .spinner,
+    .stock-btn:disabled .spinner {
+      display: inline-block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .modal-step {
+      display: none;
+    }
+    .modal-step.active {
+      display: block;
+    }
+    .toast-container {
+      position: fixed;
+      top: var(--space-lg);
+      right: var(--space-lg);
+      z-index: 1050;
+    }
+    .toast {
+      background-color: var(--black-secondary);
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      color: var(--text-primary);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-md);
+    }
+    .toast-header {
+      background-color: rgba(184, 134, 11, 0.05);
+      color: var(--text-primary);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+    }
+    .toast-body {
+      font-size: var(--font-size-sm);
+    }
+    .toast-success .toast-header {
+      background-color: rgba(56, 142, 60, 0.2);
+    }
+    .toast-danger .toast-header {
+      background-color: rgba(198, 40, 40, 0.2);
+    }
+  </style>
+</head>
+<body>
+<header class="admin-header">
+  <div class="admin-header__brand">
+    <i class="fas fa-paint-brush admin-header__icon"></i>
+    <span class="admin-header__title">Asian Art Gallery Admin</span>
+  </div>
+  <nav class="admin-header__nav">
+    <a th:href="@{/admin}" class="admin-header__link" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a th:href="@{/admin/artworks}" class="admin-header__link" th:classappend="${currentPage == 'artworks'} ? 'active' : ''">
+      <i class="fas fa-image"></i> Artworks
+    </a>
+    <a th:href="@{/admin/orders}" class="admin-header__link" th:classappend="${currentPage == 'orders'} ? 'active' : ''">
+      <i class="fas fa-shopping-cart"></i> Orders
+    </a>
+    <a th:href="@{/admin/customers}" class="admin-header__link" th:classappend="${currentPage == 'customers'} ? 'active' : ''">
+      <i class="fas fa-users"></i> Customers
+    </a>
+    <a th:href="@{/logout}" class="admin-header__link">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </nav>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+    <div class="toast-container">
+      <div th:if="${successMessage}" class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+          <i class="fas fa-check-circle me-2"></i>
+          <strong class="me-auto">Success</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" th:text="${successMessage}"></div>
+      </div>
+      <div th:if="${errorMessage}" class="toast toast-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <strong class="me-auto">Error</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" th:text="${errorMessage}"></div>
+      </div>
+    </div>
+    <h1>
+      <i class="fas fa-image title-icon"></i>
+      Artworks
+    </h1>
+
+    <div class="search-container">
+      <form th:action="@{/admin/artworks}" method="get" class="search-form">
+        <div class="form-group">
+          <label class="form-label" for="name">
+            <i class="fas fa-palette"></i> Artwork Name
+          </label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Search by artwork name..." th:value="${param.name ?: ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="minPrice">
+            <i class="fas fa-dollar-sign"></i> Min Price
+          </label>
+          <input type="number" step="0.01" id="minPrice" name="minPrice" class="form-control" placeholder="Min price" th:value="${param.minPrice ?: ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="maxPrice">
+            <i class="fas fa-dollar-sign"></i> Max Price
+          </label>
+          <input type="number" step="0.01" id="maxPrice" name="maxPrice" class="form-control" placeholder="Max price" th:value="${param.maxPrice ?: ''}">
+        </div>
+        <div class="search-actions">
+          <button type="button" class="btn btn-outline" onclick="window.location.href='/admin/artworks'">
+            <i class="fas fa-redo"></i> Clear
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </form>
+      <div th:if="${searchError}" class="alert alert-danger mt-3">
+        <i class="fas fa-exclamation-circle alert-icon"></i>
+        <span th:text="${searchError}"></span>
+      </div>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success">
+      <i class="fas fa-check-circle alert-icon"></i>
+      <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger">
+      <i class="fas fa-exclamation-circle alert-icon"></i>
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div class="artwork-controls" th:if="${artworks != null and !artworks.isEmpty()}">
+      <div class="artwork-view-options">
+        <button class="view-btn active" data-view="grid">
+          <i class="fas fa-th"></i>
+        </button>
+        <button class="view-btn" data-view="list">
+          <i class="fas fa-th-list"></i>
+        </button>
+      </div>
+      <div class="artwork-sort">
+        <span class="artwork-sort-label">Sort by:</span>
+        <select class="artwork-sort-select" id="sort-select">
+          <option value="name-asc" th:selected="${param.sort == 'name-asc'}">Name: A to Z</option>
+          <option value="name-desc" th:selected="${param.sort == 'name-desc'}">Name: Z to A</option>
+          <option value="price-asc" th:selected="${param.sort == 'price-asc'}">Price: Low to High</option>
+          <option value="price-desc" th:selected="${param.sort == 'price-desc'}">Price: High to Low</option>
+          <option value="year-asc" th:selected="${param.sort == 'year-asc'}">Year: Oldest First</option>
+          <option value="year-desc" th:selected="${param.sort == 'year-desc'}">Year: Newest First</option>
+          <option value="stock-asc" th:selected="${param.sort == 'stock-asc'}">Stock: Low to High</option>
+          <option value="stock-desc" th:selected="${param.sort == 'stock-desc'}">Stock: High to Low</option>
+        </select>
+      </div>
+    </div>
+
+    <div th:if="${artworks == null or artworks.isEmpty()}" class="empty-state">
+      <i class="fas fa-paint-brush empty-state-icon"></i>
+      <h3 class="empty-state-title">No Artworks Found</h3>
+      <p class="empty-state-message">
+        <span th:if="${param.name != null or param.minPrice != null or param.maxPrice != null}">
+          No artworks match your search criteria. Try adjusting your filters or
+          <a th:href="@{/admin/products/add}">add a new artwork</a>.
+        </span>
+        <span th:unless="${param.name != null or param.minPrice != null or param.maxPrice != null}">
+          No artworks found. <a th:href="@{/admin/products/add}">Add an artwork</a> to get started.
+        </span>
+      </p>
+      <a th:href="@{/admin/artworks}" class="empty-state-action">
+        <i class="fas fa-redo"></i> Clear Search
+      </a>
+    </div>
+
+    <div class="artwork-grid" th:if="${artworks != null and !artworks.isEmpty()}">
+      <div class="artwork-card" th:each="artwork : ${artworks}">
+        <div class="artwork-image-container">
+          <img th:src="@{/api/product-images/{id}(id=${artwork.id})}" class="artwork-card__image"
+               th:alt="${artwork.name ?: 'Artwork'}" loading="lazy" onerror="this.src='/images/placeholder.jpg'"/>
+          <span th:class="${artwork.stock <= 0} ? 'artwork-status sold-out' : 'artwork-status in-stock'"
+                th:text="${artwork.stock <= 0} ? 'Sold Out' : 'In Stock'"></span>
+        </div>
+        <div class="artwork-card__body">
+          <h2 class="artwork-card__title" th:text="${artwork.name ?: 'Untitled'}">Artwork Title</h2>
+          <div class="artwork-meta">
+            <span class="artwork-meta-label">Artist:</span>
+            <span class="artwork-meta-value" th:text="${artwork.artist ?: 'Unknown'}">Unknown</span>
+            <span class="artwork-meta-label">Medium:</span>
+            <span class="artwork-meta-value" th:text="${artwork.medium ?: 'Not specified'}">Not specified</span>
+            <span class="artwork-meta-label">Dimensions:</span>
+            <span class="artwork-meta-value" th:text="${artwork.dimensions ?: 'Not specified'}">Not specified</span>
+            <span class="artwork-meta-label">Year:</span>
+            <span class="artwork-meta-value" th:text="${artwork.year ?: 'Not specified'}">Not specified</span>
+            <span class="artwork-meta-label">Style:</span>
+            <span class="artwork-meta-value" th:text="${artwork.category ?: 'Not specified'}">Not specified</span>
+            <span class="artwork-meta-label">Stock:</span>
+            <span class="artwork-meta-value" th:text="${artwork.stock ?: '0'}">0</span>
+          </div>
+          <div class="artwork-footer">
+            <span class="artwork-card__price" th:text="|$${artwork.price != null ? #numbers.formatDecimal(artwork.price, 1, 2) : '0.00'}|">$0.00</span>
+            <div class="artwork-actions">
+              <a th:href="@{/admin/products/edit/{id}(id=${artwork.id})}" class="artwork-action-btn" title="Edit">
+                <i class="fas fa-edit"></i>
+              </a>
+              <button class="artwork-action-btn" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                      th:attr="data-id=${artwork.id},data-name=${artwork.name},data-artist=${artwork.artist ?: 'Unknown'},data-price=${artwork.price != null ? #numbers.formatDecimal(artwork.price, 1, 2) : '0.00'}">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+            <form th:action="@{/admin/products/{id}/stock(id=${artwork.id})}" method="post" class="stock-form">
+              <input type="number" name="stock" th:value="${artwork.stock ?: 0}" min="0" class="stock-input" required/>
+              <button type="submit" class="stock-btn">
+                <span class="spinner"></span>Update Stock
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-step active" id="step-warning">
+              <p id="warning-message">Are you sure you want to delete this artwork?</p>
+              <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-step" id="step-confirm">
+              <p class="text-danger"><strong>Final confirmation:</strong></p>
+              <p id="confirm-message">Are you absolutely sure you want to delete "Artwork Title"?</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="modal-step active w-100 d-flex justify-content-between" id="step-warning-buttons">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" id="proceedBtn">Proceed</button>
+            </div>
+            <div class="modal-step w-100 d-flex justify-content-between" id="step-confirm-buttons">
+              <button type="button" class="btn btn-secondary" id="backBtn">Go Back</button>
+              <form id="deleteForm" method="post">
+                <button type="submit" class="btn btn-danger" id="deleteConfirmBtn">
+                  <span class="spinner"></span>Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" th:if="${page != null and page.totalPages != null and artworks != null and !artworks.isEmpty() and page.totalPages > 1}">
+      <a th:href="@{/admin/artworks(page=${page.number > 0 ? page.number - 1 : 0}, size=${page.size ?: 10}, sort=${param.sort ?: 'name,asc'}, name=${param.name ?: ''}, minPrice=${param.minPrice ?: ''}, maxPrice=${param.maxPrice ?: ''})}"
+         class="page-item" th:classappend="${page.number <= 0} ? 'disabled'">
+        <i class="fas fa-chevron-left"></i>
+      </a>
+      <th:block th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+        <a th:href="@{/admin/artworks(page=${i}, size=${page.size ?: 10}, sort=${param.sort ?: 'name,asc'}, name=${param.name ?: ''}, minPrice=${param.minPrice ?: ''}, maxPrice=${param.maxPrice ?: ''})}"
+           class="page-item" th:classappend="${i == page.number} ? 'active'">${i + 1}</a>
+      </th:block>
+      <a th:href="@{/admin/artworks(page=${page.number < page.totalPages - 1 ? page.number + 1 : page.totalPages - 1}, size=${page.size ?: 10}, sort=${param.sort ?: 'name,asc'}, name=${param.name ?: ''}, minPrice=${param.minPrice ?: ''}, maxPrice=${param.maxPrice ?: ''})}"
+         class="page-item" th:classappend="${page.number >= page.totalPages - 1} ? 'disabled'">
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+    <div th:if="${artworks != null and !artworks.isEmpty() and (page == null or page.totalPages <= 1)}" class="text-center mt-4">
+      <p class="text-muted">All artworks displayed (no pagination needed).</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© 2025 Asian Art Gallery Admin. All rights reserved.</p>
+  </div>
+</footer>
+
+<script th:src="@{/webjars/bootstrap/5.3.2/js/bootstrap.bundle.min.js}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modal
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'), {
+      backdrop: 'static',
+      keyboard: false,
+      show: false
+    });
+
+    // Handle delete button clicks
+    document.querySelectorAll('[data-bs-target="#deleteModal"]').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const artworkId = this.getAttribute('data-id');
+        const artworkName = this.getAttribute('data-name') || 'this artwork';
+        const artist = this.getAttribute('data-artist') || 'Unknown';
+        const price = this.getAttribute('data-price') || '0.00';
+        document.getElementById('warning-message').textContent =
+          `Are you sure you want to delete "${artworkName}" by ${artist}?`;
+        document.getElementById('confirm-message').textContent =
+          `Are you absolutely sure you want to delete "${artworkName}" by ${artist} priced at $${price}?`;
+        document.getElementById('deleteForm').action = `/admin/products/delete/${artworkId}`;
+        showStep('warning');
+        deleteModal.show();
+      });
+    });
+
+    // Proceed to confirmation step
+    document.getElementById('proceedBtn').addEventListener('click', function() {
+      showStep('confirm');
+    });
+
+    // Go back to warning step
+    document.getElementById('backBtn').addEventListener('click', function() {
+      showStep('warning');
+    });
+
+    // Handle delete form submission
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+      const deleteBtn = document.getElementById('deleteConfirmBtn');
+      deleteBtn.disabled = true;
+      deleteBtn.querySelector('.spinner').style.display = 'inline-block';
+    });
+
+    // Handle stock form submissions
+    document.querySelectorAll('.stock-form').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const stockInput = this.querySelector('.stock-input');
+        const stockBtn = this.querySelector('.stock-btn');
+        const stockValue = parseInt(stockInput.value);
+
+        // Client-side validation
+        if (isNaN(stockValue) || stockValue < 0) {
+          showToast('error', 'Please enter a valid stock value (0 or greater).');
+          return;
+        }
+
+        stockBtn.disabled = true;
+        stockBtn.querySelector('.spinner').style.display = 'inline-block';
+
+        // Submit form via fetch
+        fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `stock=${stockValue}`
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update stock');
+          }
+          return response.text();
+        })
+        .then(() => {
+          showToast('success', 'Stock updated successfully!');
+          setTimeout(() => window.location.reload(), 1000);
+        })
+        .catch(error => {
+          showToast('error', error.message);
+        })
+        .finally(() => {
+          stockBtn.disabled = false;
+          stockBtn.querySelector('.spinner').style.display = 'none';
+        });
+      });
+    });
+
+    // View mode toggle
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const artworkGrid = document.querySelector('.artwork-grid');
+    viewBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        viewBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        if (this.dataset.view === 'list') {
+          artworkGrid.classList.add('list');
+        } else {
+          artworkGrid.classList.remove('list');
+        }
+      });
+    });
+
+    // Sort functionality
+    document.getElementById('sort-select').addEventListener('change', function() {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('sort', this.value);
+      window.location.href = currentUrl.toString();
+    });
+
+    // Show modal step
+    function showStep(step) {
+      document.querySelectorAll('.modal-step').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById(`step-${step}`).classList.add('active');
+      document.getElementById(`step-${step}-buttons`).classList.add('active');
+    }
+
+    // Show toast notification
+    function showToast(type, message) {
+      const toastContainer = document.querySelector('.toast-container');
+      const toast = document.createElement('div');
+      toast.classList.add('toast', `toast-${type}`);
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.setAttribute('data-bs-autohide', 'true');
+      toast.setAttribute('data-bs-delay', '5000');
+      toast.innerHTML = `
+        <div class="toast-header">
+          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+          <strong class="me-auto">${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">${message}</div>
+      `;
+      toastContainer.appendChild(toast);
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+      toast.addEventListener('hidden.bs.toast', () => toast.remove());
+    }
+
+    // Initialize toasts
+    document.querySelectorAll('.toast').forEach(toastEl => {
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+  });
+</script>
+</body>
+</html>
